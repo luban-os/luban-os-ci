@@ -1,0 +1,31 @@
+id = "L5-01"
+what = "a machine lists and reads its files: virtio-fs within its budget (9p measured beside it)"
+covers = ["LCI-L5-FILES"]
+needs = ["kvm"]
+systems = ["core-machine"]
+
+[[step]]
+what = "on virtio-fs (the default)"
+run = "grep ' / ' /proc/mounts; find /usr -type f | wc -l"
+has = ["virtiofs"]
+measure = "find-usr-virtiofs"
+
+[[step]]
+in = "host"
+run = "luban config {system} --files 9p && luban stop {system}"
+timeout = 120
+
+[[step]]
+what = "on 9p"
+run = "grep ' / ' /proc/mounts; find /usr -type f | wc -l"
+has = ["9p"]
+measure = "find-usr-9p"
+timeout = 900
+
+[[step]]
+in = "host"
+run = "luban config {system} --files virtiofs && luban stop {system}"
+timeout = 120
+
+[budget]
+find-usr-virtiofs = 3.0

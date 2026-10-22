@@ -1,0 +1,17 @@
+id = "L2-09"
+what = "persist home: after a restart /home is as it was and the system part as it began"
+covers = ["LCI-L2-PERSIST"]
+needs = ["kvm"]
+systems = ["core-persist-home"]
+
+[[step]]
+run = "echo kept > ~/kept.txt && sudo sh -c 'echo gone > /opt/gone.txt'"
+
+[[step]]
+in = "host"
+run = "luban stop {system}"
+timeout = 120
+
+[[step]]
+run = "cat ~/kept.txt; test ! -e /opt/gone.txt && echo system-restored"
+has = ["kept", "system-restored"]

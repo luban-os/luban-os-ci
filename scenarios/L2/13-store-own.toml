@@ -1,0 +1,6 @@
+id = "L2-13"
+what = "after --store own and back to shared, scenarios 1-5 give the same results"
+covers = ["LCI-L2-STORE"]
+needs = ["kvm"]
+systems = ["core-machine"]
+pending = "xlings K5 (luban config --store own|shared) is not in a release yet"

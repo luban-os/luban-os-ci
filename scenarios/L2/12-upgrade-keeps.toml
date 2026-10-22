@@ -1,0 +1,19 @@
+id = "L2-12"
+what = "after luban upgrade what was installed still works"
+covers = ["LCI-L2-UPGRADE"]
+needs = ["kvm"]
+systems = ["core-machine"]
+
+[[step]]
+run = "sudo xlings install -y xim:bat && bat --version"
+matches = ["^bat \\d"]
+timeout = 900
+
+[[step]]
+in = "host"
+run = "luban upgrade {system} -y"
+timeout = 1800
+
+[[step]]
+run = "bat --version"
+matches = ["^bat \\d"]

@@ -1,0 +1,50 @@
+# What luban-os-ci holds Luban to (xlings design 2026-10-21 §9). Every
+# scenario `covers` one or more of these; a requirement no scenario covers is
+# reported by tests/test_scenarios.py.
+
+[LCI-L2-XLINGS]
+text = "in a system xlings answers and searches the index, with nothing to warn about"
+[LCI-L2-USER-INSTALL]
+text = "a user installs a package for themself without sudo, uses it at once and removes it"
+[LCI-L2-SUDO]
+text = "what affects every user of a system (the index, a system-wide install) needs sudo: refused without it with the exact command, done with it"
+[LCI-L2-MULTIUSER]
+text = "users keep versions of their own; sudo's choice is the default only for those without one"
+[LCI-L2-MCPP]
+text = "mcpp makes and runs a project with the system's own toolchain and its doctor names no foreign sysroot or missing upstream"
+[LCI-L2-DOCTOR]
+text = "xlings self doctor is clean in a new system"
+[LCI-L2-HOST-INSTALL]
+text = "the host installs into a system, which has it at once"
+[LCI-L2-PERSIST]
+text = "a system's persist setting holds across a restart"
+[LCI-L2-NETWORK]
+text = "without a network an install says so briefly; through a proxy it installs"
+[LCI-L2-SHELLS]
+text = "fish and bash find xlings' programs, and XDG_DATA_DIRS keeps /usr/share"
+[LCI-L2-UPGRADE]
+text = "what was installed works after luban upgrade"
+[LCI-L2-STORE]
+text = "switching a system's store between shared and own changes no result"
+[LCI-L2-AGENT]
+text = "in the agent workspace a system-wide install waits for the host's approval"
+[LCI-L3-CHECKS]
+text = "every package's declared checks pass, from outside the system and inside it"
+[LCI-L4-DESKTOP]
+text = "the desktop comes up in the Luban OS window and draws"
+[LCI-L4-LAUNCHER]
+text = "the launcher lists the desktop's programs"
+[LCI-L4-FALKON]
+text = "Falkon opens a page in a desktop and stays up"
+[LCI-L4-SOUND]
+text = "the desktop's player plays the sample through the system's sound"
+[LCI-L5-FILES]
+text = "a machine reads its files over virtio-fs within its budget; 9p is measured beside it"
+[LCI-L5-IDLE]
+text = "an idle desktop draws only what changes"
+[LCI-L6-FRESH]
+text = "the version under test makes a system and runs in it"
+[LCI-L6-IMAGE]
+text = "a system exported to an ISO boots and xlings answers in it"
+[LCI-L2-CONCURRENT]
+text = "commands run in a machine at once each run to their end; a machine started for commands powers off when the last ends"

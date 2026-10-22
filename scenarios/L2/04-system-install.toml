@@ -1,0 +1,15 @@
+id = "L2-04"
+what = "sudo installs for the whole system: another user has it too"
+covers = ["LCI-L2-SUDO"]
+needs = ["kvm"]
+systems = ["core-machine"]
+
+[[step]]
+run = "sudo xlings install -y xim:bat"
+timeout = 900
+
+[[step]]
+what = "alice, another user, runs it"
+user = "alice"
+run = "bat --version"
+matches = ["^bat \\d"]

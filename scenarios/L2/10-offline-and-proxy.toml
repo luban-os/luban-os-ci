@@ -1,0 +1,30 @@
+id = "L2-10"
+what = "with no way out an install says so in a line; given a proxy it installs"
+covers = ["LCI-L2-NETWORK"]
+needs = ["kvm", "proxy"]
+systems = ["core-machine"]
+
+[[step]]
+in = "host"
+run = "luban config {system} --proxy socks5h://127.0.0.1:9 && luban stop {system}"
+timeout = 120
+
+[[step]]
+run = "sudo xlings update; xlings install -y xim:zoxide 2>&1 | grep -v '^ *$' | tail -3"
+lacks = ["Traceback", "[warn]"]
+timeout = 600
+
+[[step]]
+in = "host"
+run = "luban config {system} --proxy {proxy} && luban stop {system}"
+timeout = 120
+
+[[step]]
+run = "xlings install -y xim:zoxide && zoxide --version"
+matches = ["^zoxide \\d"]
+timeout = 900
+
+[[step]]
+in = "host"
+run = "luban config {system} --proxy off && luban stop {system}"
+timeout = 120

@@ -1,0 +1,16 @@
+id = "L2-06"
+what = "mcpp makes and runs a project with the system's toolchain, and its doctor is clean"
+covers = ["LCI-L2-MCPP"]
+needs = ["kvm"]
+systems = ["core-machine"]
+
+[[step]]
+run = "cd /tmp && rm -rf demo && mcpp new demo && cd demo && mcpp run"
+has = ["Hello from demo"]
+measure = "first-mcpp-run"
+timeout = 1800
+
+[[step]]
+run = "cd /tmp/demo && mcpp self doctor"
+lacks = ["belongs to neither", "is not a directory"]
+known = "mcpp-community/mcpp#831: a Luban system's root and its /xlings upstream, in mcpp 2026.10.22.1"

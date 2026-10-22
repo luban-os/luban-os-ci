@@ -1,0 +1,11 @@
+id = "L3-02"
+what = "inside the system, every declared run check passes (its programs start)"
+covers = ["LCI-L3-CHECKS"]
+needs = ["kvm"]
+systems = ["desktop-machine"]
+
+[[step]]
+user = "root"
+run = "luban status --check"
+lacks = ["✗"]
+timeout = 600

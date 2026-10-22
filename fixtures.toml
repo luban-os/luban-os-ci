@@ -1,0 +1,30 @@
+# The systems scenarios run in (README.md §Fixtures): made once a run, the
+# first time a scenario names one, with `luban new <fixture> -y <new...>`;
+# `then` runs on the host after it (each {system} is the fixture's name).
+# `user` is who `luban run` logs in as unless a step says.
+
+# A system made on a host: its default user owns its home (the host's own
+# uid), as an owner needs no sudo; alice, bob and carol own nothing of it.
+[core-machine]
+new = ["--edition", "core", "--mode", "machine", "--user", "lubanoser", "--no-password"]
+user = "lubanoser"
+then = ["luban run {system} --user root -- sh -c 'adduser -D alice && adduser -D bob && adduser -D carol'"]
+
+[desktop-machine]
+new = ["--edition", "desktop", "--mode", "machine", "--user", "lubanoser", "--no-password"]
+user = "lubanoser"
+timeout = 3600
+
+[core-sandbox]
+new = ["--edition", "core", "--user", "lubanoser", "--no-password"]
+user = "lubanoser"
+
+# Its system part restored each start, /home kept (§9.4 9).
+[core-persist-home]
+new = ["--edition", "core", "--mode", "machine", "--persist", "home", "--user", "lubanoser", "--no-password"]
+user = "lubanoser"
+
+# The agent workspace: its only network the harness's proxy (§9.4 14).
+[agent]
+new = ["--edition", "agent-workspace", "--proxy", "{proxy}"]
+user = "root"

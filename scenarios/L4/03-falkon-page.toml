@@ -1,0 +1,31 @@
+id = "L4-03"
+what = "Falkon opens a local page in a desktop and stays up"
+covers = ["LCI-L4-FALKON"]
+needs = ["kvm"]
+systems = ["desktop-machine"]
+
+[[step]]
+run = """
+export XDG_RUNTIME_DIR=/tmp/lci-rt; mkdir -p -m 700 $XDG_RUNTIME_DIR
+echo '<html><head><title>LubanPage</title></head><body>hello</body></html>' > /tmp/p.html
+WLR_BACKENDS=headless WLR_RENDERER=pixman WLR_LIBINPUT_NO_DEVICES=1 xdesk --profile classic --size 1280x800 >/tmp/xdesk.log 2>&1 &
+for i in $(seq 1 50); do [ -S $XDG_RUNTIME_DIR/wayland-0 ] && break; sleep 0.2; done
+export WAYLAND_DISPLAY=wayland-0
+QTWEBENGINE_REMOTE_DEBUGGING=127.0.0.1:9222 falkon file:///tmp/p.html >/tmp/falkon.log 2>&1 &
+fp=$!
+for i in $(seq 1 120); do
+  python3 - <<'PY' 2>/dev/null && { echo page-loaded; break; }
+import json, urllib.request, sys
+pages = json.load(urllib.request.urlopen("http://127.0.0.1:9222/json", timeout=2))
+sys.exit(0 if any(p.get("title") == "LubanPage" for p in pages) else 1)
+PY
+  kill -0 $fp 2>/dev/null || { echo falkon-ended; break; }
+  sleep 0.5
+done
+sleep 3
+kill -0 $fp 2>/dev/null && echo falkon-alive
+kill $fp; pkill -x xdesk; true
+"""
+has = ["page-loaded", "falkon-alive"]
+lacks = ["falkon-ended"]
+timeout = 300
