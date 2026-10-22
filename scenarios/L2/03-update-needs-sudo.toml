@@ -17,7 +17,6 @@ user = "alice"
 run = "xlings update"
 exit = "nonzero"
 lacks = ["[warn]"]
-known = "xlings design 2026-10-21 J32: alice cannot make her ~/.xlings in a machine, and says so"
 
 [[step]]
 what = "sudo updates (the system's user may)"

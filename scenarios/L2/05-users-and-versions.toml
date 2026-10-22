@@ -15,21 +15,18 @@ what = "alice chooses 22 for herself"
 user = "alice"
 run = "xlings use node 22.17.1 && node --version"
 has = ["v22.17.1"]
-known = "xlings design 2026-10-21 J32: in a machine a new user's home is the host's uid (chown is EINVAL on 9p and virtio-fs)"
 
 [[step]]
 what = "bob chooses 26 for himself"
 user = "bob"
 run = "xlings use node 26.11.1 && node --version"
 has = ["v26.11.1"]
-known = "xlings design 2026-10-21 J32"
 
 [[step]]
 what = "bob's choice is not alice's"
 user = "alice"
 run = "node --version"
 has = ["v22.17.1"]
-known = "xlings design 2026-10-21 J32"
 
 [[step]]
 what = "carol, with none of her own, has the system's"
@@ -47,7 +44,6 @@ what = "alice keeps hers"
 user = "alice"
 run = "node --version"
 has = ["v22.17.1"]
-known = "xlings design 2026-10-21 J32"
 
 [[step]]
 what = "carol follows the system's"
