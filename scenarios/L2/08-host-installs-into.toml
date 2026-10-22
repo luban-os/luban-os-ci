@@ -1,0 +1,14 @@
+id = "L2-08"
+what = "the host installs into the system, which has it at once"
+covers = ["LCI-L2-HOST-INSTALL"]
+needs = ["kvm"]
+systems = ["core-machine"]
+
+[[step]]
+in = "host"
+run = "xlings install -y --subos {system} xim:esbuild"
+timeout = 900
+
+[[step]]
+run = "esbuild --version"
+matches = ["^\\d+\\.\\d+"]

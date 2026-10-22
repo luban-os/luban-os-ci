@@ -1,0 +1,19 @@
+id = "L2-14"
+what = "in the agent workspace a system-wide install waits for the host, and is done once approved"
+covers = ["LCI-L2-AGENT"]
+needs = ["proxy"]
+systems = ["agent"]
+
+[[step]]
+run = "xlings install -y xim:esbuild; true"
+timeout = 300
+
+[[step]]
+in = "host"
+what = "the host sees the request and approves it"
+run = "xlings subos requests {system} --json; ls {home}/state/subos/{system}/requests || { find / -path '*/subos/{system}/requests/*' 2>/dev/null | head; tail -5 {home}/logs/subos/{system}/events.ndjson; }; id=$(xlings subos requests {system} --json | sed -n 's/.*\"id\": *\"\\{0,1\\}\\([^\",}]*\\).*/\\1/p' | head -1); test -n \"$id\" && xlings subos approve {system} \"$id\""
+timeout = 900
+
+[[step]]
+run = "esbuild --version"
+matches = ["^\\d+\\.\\d+"]

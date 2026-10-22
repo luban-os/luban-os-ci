@@ -1,0 +1,14 @@
+id = "L2-01"
+what = "xlings answers in the system and finds a package, with nothing to warn about"
+covers = ["LCI-L2-XLINGS"]
+needs = ["kvm"]
+systems = ["core-machine", "desktop-machine"]
+
+[[step]]
+run = "xlings --version"
+matches = ["^xlings \\d{4}\\.\\d+\\.\\d+\\.\\d+"]
+
+[[step]]
+run = "xlings search node"
+has = ["node"]
+lacks = ["[warn]", "error"]

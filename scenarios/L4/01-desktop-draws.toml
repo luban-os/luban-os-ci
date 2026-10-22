@@ -1,0 +1,18 @@
+id = "L4-01"
+what = "the desktop comes up in the Luban OS window and draws"
+covers = ["LCI-L4-DESKTOP"]
+needs = ["kvm", "luban-os"]
+systems = ["desktop-machine"]
+
+[[step]]
+in = "luban-os"
+run = "desktop draws"
+script = """
+wait desktop 600
+frames 30
+screenshot {work}/L4-01-desktop.ppm
+state {work}/L4-01-state.json
+"""
+timeout = 900
+read = "{work}/L4-01-state.json"
+floors = { "perf.frames" = 10 }

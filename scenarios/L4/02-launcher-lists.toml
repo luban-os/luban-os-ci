@@ -1,0 +1,9 @@
+id = "L4-02"
+what = "the launcher lists the terminal and the browser"
+covers = ["LCI-L4-LAUNCHER"]
+needs = ["kvm"]
+systems = ["desktop-machine"]
+
+[[step]]
+run = "ls /usr/share/applications"
+has = ["foot", "falkon"]

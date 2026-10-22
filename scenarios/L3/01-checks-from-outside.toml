@@ -1,0 +1,11 @@
+id = "L3-01"
+what = "every package's checks that can be seen from outside pass: its root, its runtime closure, its launchers"
+covers = ["LCI-L3-CHECKS"]
+needs = ["kvm"]
+systems = ["core-machine", "desktop-machine"]
+
+[[step]]
+in = "host"
+run = "luban status {system} --check"
+lacks = ["✗", "[warn]"]
+timeout = 300

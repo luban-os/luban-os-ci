@@ -1,0 +1,18 @@
+id = "L2-15"
+what = "two commands in a machine at once: the one that started it ending does not cut the other short"
+covers = ["LCI-L2-CONCURRENT"]
+needs = ["kvm"]
+systems = ["core-machine"]
+
+[[step]]
+in = "host"
+run = "luban stop {system} >/dev/null 2>&1; (luban run {system} -- sh -c 'sleep 20; echo first-done') & sleep 12; luban run {system} -- sh -c 'sleep 25; echo second-done'; wait"
+has = ["first-done", "second-done"]
+lacks = ["stopped while"]
+timeout = 600
+
+[[step]]
+in = "host"
+what = "the last one out powered it off"
+run = "sleep 5; luban status {system} --json"
+lacks = ["\"running\":true", "\"running\": true"]

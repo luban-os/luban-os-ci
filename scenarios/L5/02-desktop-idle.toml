@@ -1,0 +1,19 @@
+id = "L5-02"
+what = "an idle desktop draws little: frames only for what changes"
+covers = ["LCI-L5-IDLE"]
+needs = ["kvm", "luban-os"]
+systems = ["desktop-machine"]
+
+[[step]]
+in = "luban-os"
+run = "idle desktop"
+script = """
+wait desktop 600
+sleep 5000
+perf reset
+sleep 10000
+state {work}/L5-02-state.json
+"""
+timeout = 900
+read = "{work}/L5-02-state.json"
+limits = { "perf.frames" = 120 }

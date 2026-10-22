@@ -1,0 +1,133 @@
+name: layers
+
+# Luban's layers on GitHub's hosted runners (README.md; xlings design
+# 2026-10-21 §9.5, §9.6). What runs:
+#   - a dispatch: a layer against a build of xlings (its CI run's artifact,
+#     `xlings_run`) or a release, with an index (a branch of xim-pkgindex);
+#   - every day: every layer, the newest release, xim-pkgindex main -- a
+#     failure opens an issue with the report;
+#   - a pull request here: the scenarios are well formed, and L2 on the newest
+#     release.
+# Every job first probes what it needs (/dev/kvm opens, qemu starts with KVM)
+# and fails when it is not there: a run that tested nothing never passes.
+on:
+  workflow_dispatch:
+    inputs:
+      layer:
+        description: "L2, L3, L4, L5, L6, or all"
+        default: "all"
+      release:
+        description: "the released xlings to test (a version, or latest); ignored with xlings_run"
+        default: "latest"
+      xlings_run:
+        description: "an openxlings/xlings CI run whose xlings-linux-x86_64 build to test instead"
+        default: ""
+      index:
+        description: "a branch of openxlings/xim-pkgindex to test with (empty: the published index)"
+        default: ""
+  schedule:
+    - cron: "17 3 * * *"
+  pull_request:
+
+permissions:
+  contents: read
+  issues: write
+  actions: read
+
+jobs:
+  scenarios:
+    name: the scenarios are well formed
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tests/test_scenarios.py
+      - run: for l in L2 L3 L4 L5 L6; do ./run.sh $l --list; done
+
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      layers: ${{ steps.p.outputs.layers }}
+    steps:
+      - id: p
+        run: |
+          want="${{ github.event.inputs.layer || 'all' }}"
+          if [ "${{ github.event_name }}" = pull_request ]; then want=L2; fi
+          if [ "$want" = all ]; then echo 'layers=["L2","L3","L4","L5","L6"]' >> "$GITHUB_OUTPUT"
+          else echo "layers=[\"$want\"]" >> "$GITHUB_OUTPUT"; fi
+
+  layer:
+    needs: [scenarios, plan]
+    name: ${{ matrix.layer }} (Linux x86_64)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        layer: ${{ fromJSON(needs.plan.outputs.layers) }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Room
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/share/boost /opt/hostedtoolcache || true
+          df -h /
+
+      # The probes (design §9.5): /dev/kvm this user opens, user namespaces a
+      # sandbox makes; checked, not assumed.
+      - name: Probe KVM and namespaces
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          test -r /dev/kvm -a -w /dev/kvm || { echo "::error::/dev/kvm is not usable on this runner"; exit 1; }
+
+      - name: The programs under test
+        id: programs
+        run: |
+          mkdir -p bin
+          if [ -n "${{ github.event.inputs.xlings_run }}" ]; then
+            gh run download "${{ github.event.inputs.xlings_run }}" -R openxlings/xlings -n xlings-linux-x86_64 -D build
+            tar -xzf build/release.tar.gz -C bin
+            v=$(find bin -path '*/bin/xlings' -type f | head -1 | xargs -I{} {} --version | awk '{print $2}')
+          else
+            v="${{ github.event.inputs.release || 'latest' }}"
+            [ "$v" = latest ] && v=$(gh release view -R openxlings/xlings --json tagName --jq .tagName | sed 's/^v//')
+            gh release download "v$v" -R openxlings/xlings -p "xlings-$v-linux-x86_64.tar.gz" -D build
+            tar -xzf build/xlings-*.tar.gz -C bin
+          fi
+          # The window and the desktop, released with the same version (or the newest).
+          for p in luban-os xdesk; do
+            gh release download "v$v" -R openxlings/xlings -p "$p-$v-linux-x86_64.tar.gz" -D build 2>/dev/null \
+              || gh release download -R openxlings/xlings -p "$p-*-linux-x86_64.tar.gz" -D build
+            tar -xzf build/$p-*-linux-x86_64.tar.gz -C bin
+          done
+          echo "dir=$PWD/bin" >> "$GITHUB_OUTPUT"
+          find bin -path '*/bin/*' -type f -perm -111 | head
+
+      - name: Run ${{ matrix.layer }}
+        run: |
+          idx="${{ github.event.inputs.index }}"
+          ./run.sh "${{ matrix.layer }}" --bin "${{ steps.programs.outputs.dir }}" ${idx:+--index "$idx"} --work "$RUNNER_TEMP/lci"
+
+      - name: Keep the report and the logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lci-${{ matrix.layer }}
+          path: |
+            ${{ runner.temp }}/lci/*/report.*
+            ${{ runner.temp }}/lci/*/logs/
+            ${{ runner.temp }}/lci/*/*.ppm
+            ${{ runner.temp }}/lci/*/home/logs/machines/
+          if-no-files-found: warn
+
+      - name: Say a daily failure
+        if: failure() && github.event_name == 'schedule'
+        run: |
+          report=$(cat "$RUNNER_TEMP"/lci/*/report.md 2>/dev/null || echo "no report: the run stopped before its scenarios")
+          gh issue create -R "$GITHUB_REPOSITORY" --title "daily ${{ matrix.layer }} failed ($(date -u +%F))" \
+            --body "$report
+
+          Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"

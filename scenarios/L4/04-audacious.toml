@@ -1,0 +1,6 @@
+id = "L4-04"
+what = "Audacious plays the sample through the system's sound"
+covers = ["LCI-L4-SOUND"]
+needs = ["kvm"]
+systems = ["desktop-machine"]
+pending = "luban:audacious joins luban:desktop with xlings 2026.10.22.1 (xim-pkgindex P5a, P7)"

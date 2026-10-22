@@ -1,0 +1,56 @@
+id = "L2-05"
+what = "users keep versions of their own: alice's and bob's choices are theirs, a user without one has the system's, and moving the system's moves only theirs"
+covers = ["LCI-L2-MULTIUSER"]
+needs = ["kvm"]
+systems = ["core-machine"]
+
+[[step]]
+what = "three versions; the system's is 24"
+user = "root"
+run = "xlings install -y xim:node@22.17.1 xim:node@24.21.0 xim:node@26.11.1 && xlings use node 24.21.0"
+timeout = 1800
+
+[[step]]
+what = "alice chooses 22 for herself"
+user = "alice"
+run = "xlings use node 22.17.1 && node --version"
+has = ["v22.17.1"]
+known = "xlings design 2026-10-21 J32: in a machine a new user's home is the host's uid (chown is EINVAL on 9p and virtio-fs)"
+
+[[step]]
+what = "bob chooses 26 for himself"
+user = "bob"
+run = "xlings use node 26.11.1 && node --version"
+has = ["v26.11.1"]
+known = "xlings design 2026-10-21 J32"
+
+[[step]]
+what = "bob's choice is not alice's"
+user = "alice"
+run = "node --version"
+has = ["v22.17.1"]
+known = "xlings design 2026-10-21 J32"
+
+[[step]]
+what = "carol, with none of her own, has the system's"
+user = "carol"
+run = "node --version"
+has = ["v24.21.0"]
+
+[[step]]
+what = "the system's moves to 26"
+user = "root"
+run = "xlings use node 26.11.1"
+
+[[step]]
+what = "alice keeps hers"
+user = "alice"
+run = "node --version"
+has = ["v22.17.1"]
+known = "xlings design 2026-10-21 J32"
+
+[[step]]
+what = "carol follows the system's"
+user = "carol"
+run = "node --version"
+has = ["v26.11.1"]

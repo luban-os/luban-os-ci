@@ -1,0 +1,9 @@
+id = "L2-07"
+what = "xlings self doctor is clean in a new system"
+covers = ["LCI-L2-DOCTOR"]
+needs = ["kvm"]
+systems = ["core-machine", "desktop-machine"]
+
+[[step]]
+run = "xlings self doctor"
+lacks = ["[warn]", "✗"]

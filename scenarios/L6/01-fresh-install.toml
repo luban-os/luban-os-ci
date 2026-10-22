@@ -1,0 +1,15 @@
+id = "L6-01"
+what = "the xlings and luban under test make a system and run in it"
+covers = ["LCI-L6-FRESH"]
+needs = ["network"]
+
+[[step]]
+in = "host"
+run = "xlings --version && luban --version"
+matches = ["^xlings \\d"]
+
+[[step]]
+in = "host"
+run = "luban new fresh --edition tiny -y && luban run fresh -- xlings --version"
+matches = ["^xlings \\d"]
+timeout = 1800

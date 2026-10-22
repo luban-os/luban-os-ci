@@ -1,0 +1,26 @@
+id = "L2-03"
+what = "updating the index affects everyone: refused without sudo with the command that does it; with sudo it updates; nothing to warn about"
+covers = ["LCI-L2-SUDO"]
+needs = ["kvm"]
+systems = ["core-machine"]
+
+# alice owns nothing of the system's home (its default user, who owns it, needs no sudo).
+[[step]]
+user = "alice"
+run = "xlings update"
+exit = "nonzero"
+has = ["sudo xlings update"]
+
+[[step]]
+what = "and says nothing more"
+user = "alice"
+run = "xlings update"
+exit = "nonzero"
+lacks = ["[warn]"]
+known = "xlings design 2026-10-21 J32: alice cannot make her ~/.xlings in a machine, and says so"
+
+[[step]]
+what = "sudo updates (the system's user may)"
+run = "sudo xlings update"
+lacks = ["[warn]"]
+timeout = 900

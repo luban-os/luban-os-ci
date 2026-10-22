@@ -1,0 +1,16 @@
+id = "L6-02"
+what = "a system exported to an ISO boots, and xlings answers in it"
+covers = ["LCI-L6-IMAGE"]
+needs = ["kvm", "network"]
+
+[[step]]
+in = "host"
+run = "luban new img --edition tiny -y && luban export img {work}/img.iso"
+timeout = 1800
+
+[[step]]
+in = "host"
+run = "{ sleep 90; printf 'xlings --version\\npoweroff\\n'; sleep 30; } | timeout 400 script -qfec 'luban enter {work}/img.iso' /dev/null"
+has = ["luban-init: booting"]
+matches = ["xlings \\d{4}\\."]
+timeout = 480

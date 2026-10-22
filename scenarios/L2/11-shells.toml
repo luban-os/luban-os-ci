@@ -1,0 +1,17 @@
+id = "L2-11"
+what = "fish and bash find xlings's programs, and XDG_DATA_DIRS keeps /usr/share"
+covers = ["LCI-L2-SHELLS"]
+needs = ["kvm"]
+systems = ["core-machine", "desktop-machine"]
+
+[[step]]
+run = "fish -l -c 'command -v xlings'"
+has = ["xlings"]
+
+[[step]]
+run = "bash -lc 'command -v xlings'"
+has = ["xlings"]
+
+[[step]]
+run = "case \"${XDG_DATA_DIRS:-/usr/local/share:/usr/share}\" in */usr/share*) echo has-usr-share;; esac"
+has = ["has-usr-share"]
