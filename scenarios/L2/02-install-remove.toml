@@ -5,7 +5,7 @@ needs = ["kvm"]
 systems = ["core-machine", "desktop-machine"]
 
 [[step]]
-run = "xlings install -y xim:zoxide || { xlings -v install -y xim:zoxide 2>&1 | grep -iE 'store|borrow|registers|snapshot|system' | tail -20; false; }"
+run = "xlings install -y xim:zoxide || { xlings -v install -y xim:zoxide 2>&1 | grep -iE 'store|borrow|registers|snapshot|system' | tail -20; cat /etc/xlings/usr; ls /xlings/subos; grep -l zoxide /xlings/subos/*/.xlings.json; false; }"
 lacks = ["[warn]"]
 timeout = 900
 
