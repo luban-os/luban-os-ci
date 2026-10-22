@@ -6,9 +6,10 @@ systems = ["core-machine"]
 
 [[step]]
 what = "on virtio-fs (the default)"
-run = "grep ' / ' /proc/mounts; find /usr -type f | wc -l"
+run = "grep ' / ' /proc/mounts; s=$(date +%s%N); find /usr -type f | wc -l; echo find_ms=$(( ($(date +%s%N) - s) / 1000000 ))"
 has = ["virtiofs"]
 measure = "find-usr-virtiofs"
+measure_from = "find_ms=(\\d+)"
 
 [[step]]
 in = "host"
@@ -17,9 +18,10 @@ timeout = 120
 
 [[step]]
 what = "on 9p"
-run = "grep ' / ' /proc/mounts; find /usr -type f | wc -l"
+run = "grep ' / ' /proc/mounts; s=$(date +%s%N); find /usr -type f | wc -l; echo find_ms=$(( ($(date +%s%N) - s) / 1000000 ))"
 has = ["9p"]
 measure = "find-usr-9p"
+measure_from = "find_ms=(\\d+)"
 timeout = 900
 
 [[step]]
@@ -28,4 +30,4 @@ run = "luban config {system} --files virtiofs && luban stop {system}"
 timeout = 120
 
 [budget]
-find-usr-virtiofs = 3.0
+find-usr-virtiofs = 1.5

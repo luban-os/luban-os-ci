@@ -501,7 +501,15 @@ def run_scenario(sc: Scenario, system: str | None, home: Home, systems: Systems,
         r = run_step(home, systems, system, step, ctx)
         problems = check(step, r) + (limits(step, ctx, res.measures) if r.code == 0 else [])
         if "measure" in step:
-            res.measures[step["measure"]] = round(r.seconds, 3)
+            # The command's own measure (`measure_from`: a pattern whose group
+            # is milliseconds it printed) -- a machine's boot is not the work.
+            took = r.seconds
+            if pattern := step.get("measure_from"):
+                if m := re.search(pattern, r.out):
+                    took = int(m.group(1)) / 1000
+                else:
+                    problems.append(f"no /{pattern}/ in the output to measure")
+            res.measures[step["measure"]] = round(took, 3)
         res.steps.append({"n": i, "run": expand(step["run"], ctx), "exit": r.code, "seconds": round(r.seconds, 2),
                           "problems": problems, "out": r.out[-2000:]})
         label = f"step {i} ({step.get('what', step['run'])[:80]})"

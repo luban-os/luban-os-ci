@@ -70,7 +70,8 @@ exit = "nonzero"                   # or a number (default 0)
 has = ["sudo xlings update"]       # in its output
 lacks = ["[warn]"]
 # in = "host" | "luban-os" (script = "...", args = "--attach {system}")
-# user = "root" | "alice" ...; timeout = 600; measure = "<name>"; max_lines = 3
+# user = "root" | "alice" ...; timeout = 600; measure = "<name>" (seconds the step took,
+#   or measure_from = "<pattern>": milliseconds the command printed); max_lines = 3
 # read = "{work}/state.json"; limits = { "perf.frames" = 120 }; floors = {...}
 ```
 
