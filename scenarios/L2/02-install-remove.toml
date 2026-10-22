@@ -16,7 +16,7 @@ matches = ["^zoxide \\d"]
 
 [[step]]
 run = "xlings remove -y zoxide"
-lacks = ["is the system's"]
+lacks = ["is the system's", "nothing to remove"]
 known = "xlings design 2026-10-21 J33: a user view's install goes active for everyone, and its remove is refused"
 
 [[step]]

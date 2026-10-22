@@ -164,9 +164,10 @@ class Home:
     def use_index(self, index: str) -> None:
         """An index under test: a directory (a checkout) or a branch of
         openxlings/xim-pkgindex -- as xlings' own CI gives one
-        (tools/ci/xlings_tools.sh): the home's only index repository, a
-        checkout beside the home, the index synced before it gone."""
-        src = self.work / "index-under-test"
+        (tools/ci/xlings_tools.sh): the home's only index repository, the
+        index synced before it gone. The checkout is inside the home, by its
+        absolute path: a machine sees the home, and nothing beside it."""
+        src = self.dir / "index-under-test"
         if Path(index).is_dir():
             files = subprocess.run(["git", "-C", index, "ls-files", "-z"], capture_output=True, check=True).stdout
             src.mkdir()
