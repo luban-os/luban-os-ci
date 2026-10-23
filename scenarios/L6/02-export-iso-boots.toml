@@ -10,8 +10,9 @@ timeout = 1800
 
 [[step]]
 in = "host"
-run = "{ sleep 90; printf 'xlings --version\\npoweroff\\n'; sleep 30; } | timeout 400 script -qfec 'luban enter {work}/img.iso' /dev/null"
+# The console asks "Please press Enter to activate this console" first: an
+# Enter, then what is typed (2026.10.24.1 took `xlings --version` as that Enter).
+run = "{ sleep 90; printf '\\nxlings --version\\npoweroff\\n'; sleep 30; } | timeout 400 script -qfec 'luban enter {work}/img.iso' /dev/null"
 has = ["luban-init: booting"]
-known = "xlings design 2026-10-23 part 3 J52: a new home's `luban enter <image>` only names xim:qemu-system (installed the first time after xlings #702)"
 matches = ["xlings \\d{4}\\."]
 timeout = 480
