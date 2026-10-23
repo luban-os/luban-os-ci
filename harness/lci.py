@@ -136,9 +136,6 @@ class Home:
         shutil.copy2(programs.xlings, self.dir / "bin" / "xlings")
         for name in ("luban", "luban-init"):
             shutil.copy2(programs.luban, self.dir / "bin" / name)
-        for name, p in (("luban-os", programs.luban_os), ("xdesk", programs.xdesk)):
-            if p:
-                shutil.copy2(p, self.dir / "bin" / name)
         r = self.sh("xlings self init", timeout=300)
         if r.code != 0:
             raise SystemExit(f"lci: xlings self init: {r.out[-800:]}")
@@ -149,6 +146,25 @@ class Home:
             r = self.sh(c, timeout=900)
             if r.code != 0:
                 raise SystemExit(f"lci: setup {c}: {r.out[-800:]}")
+        for name, p in (("luban-os", programs.luban_os), ("xdesk", programs.xdesk)):
+            if p:
+                self.install_released(name)
+
+    def install_released(self, name: str) -> None:
+        """luban-os and xdesk are not static: they run on the glibc and the
+        graphics stack their recipes bring, the way a user gets them -- the
+        archive's binary alone needs the build's glibc (2026-10-23, L4-01 and
+        L5-02 on ubuntu-24.04: `GLIBC_2.43' not found). The version under
+        test, or the index's newest where it has not got that one yet."""
+        version = self.sh("xlings --version", timeout=60).out.split()
+        tried = []
+        for spec in ([f"xim:{name}@{version[1]}"] if len(version) > 1 else []) + [f"xim:{name}"]:
+            r = self.sh(f"xlings install -y {spec}", timeout=1800)
+            if r.code == 0:
+                log(f"{name}: {spec} installed")
+                return
+            tried.append(f"{spec}: {r.out[-400:]}")
+        raise SystemExit(f"lci: {name} could not be installed: " + " | ".join(tried))
 
     def env(self) -> dict[str, str]:
         e = {k: os.environ[k] for k in PASSED_ENV if k in os.environ}
