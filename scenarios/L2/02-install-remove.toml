@@ -20,6 +20,12 @@ run = "zoxide --version"
 matches = ["^zoxide \\d"]
 
 [[step]]
+what = "it is theirs: the system's own user does not have it (xlings design 2026-10-23 J33)"
+user = "root"
+run = "command -v zoxide"
+exit = "nonzero"
+
+[[step]]
 run = "xlings remove -y zoxide"
 lacks = ["is the system's", "nothing to remove"]
 
@@ -27,4 +33,3 @@ lacks = ["is the system's", "nothing to remove"]
 what = "it is gone"
 run = "command -v zoxide"
 exit = "nonzero"
-known = "xlings design 2026-10-21 J33: a user view's install goes active for everyone"

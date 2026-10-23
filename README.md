@@ -34,6 +34,12 @@ logs, and its report -- `report.md`, `report.json`.
 computer's own preparation (on a host whose `/usr/bin/bwrap` is not usable:
 `--setup 'xlings install -y xim:bwrap'`).
 
+`luban-os` and `xdesk` are not static programs: where a run has them (a
+release's archives), the home installs `xim:luban-os` and `xim:xdesk` through
+xlings -- the version under test, or the index's newest when it has not got
+that one -- so they run on the glibc and graphics stack their recipes bring,
+as they do for a person.
+
 ## What a run says
 
 Each scenario in each of its systems is `passed`, `failed` (and why: the
