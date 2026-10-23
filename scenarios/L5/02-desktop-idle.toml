@@ -16,4 +16,6 @@ state {work}/L5-02-state.json
 """
 timeout = 900
 read = "{work}/L5-02-state.json"
-limits = { "perf.frames" = 120 }
+# What was shown: under a script the window turns on the script's own beat
+# (30 ms), so perf.frames is that beat (335 in 10 s), not the desktop's frames.
+limits = { "perf.presented" = 120 }
