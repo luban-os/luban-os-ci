@@ -7,6 +7,14 @@ systems = ["desktop-machine"]
 # xlings design 2026-10-24 §4 (S9, S11): no window -- the desktop's displays
 # on the bus, through `luban display`; the machine's frames through its
 # shared memory.
+# The harness acts as an agent (XLINGS_AGENT_MODE=1): it drives a desktop
+# with the system's desktop-control grant, which its owner gives.
+[[step]]
+in = "host"
+what = "the owner lets an agent drive the desktop"
+run = "luban config {system} --allow desktop-control -y"
+timeout = 120
+
 [[step]]
 in = "host"
 run = "luban enter {system} --display virtual=1280x800"
