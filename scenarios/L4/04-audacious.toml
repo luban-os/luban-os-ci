@@ -3,4 +3,27 @@ what = "Audacious plays the sample through the system's sound"
 covers = ["LCI-L4-SOUND"]
 needs = ["kvm"]
 systems = ["desktop-machine"]
-pending = "luban:audacious joins luban:desktop with xlings 2026.10.22.1 (xim-pkgindex P5a, P7)"
+
+# The system's sound server (luban:audio: PipeWire with the `luban` sink) writes
+# what is played into /tmp/luban-audio.pcm, what `luban __audio` carries to the
+# computer's speakers; the step reads it there: the player's sound, not silence.
+[[step]]
+run = """
+export XDG_RUNTIME_DIR=/tmp/lci-rt; mkdir -p -m 700 $XDG_RUNTIME_DIR
+luban-audio >/tmp/audio.log 2>&1 &
+for i in $(seq 1 50); do [ -S $XDG_RUNTIME_DIR/pipewire-0 ] && break; sleep 0.2; done
+[ -p /tmp/luban-audio.pcm ] || mkfifo -m 666 /tmp/luban-audio.pcm
+(timeout 20 head -c 2000000 /tmp/luban-audio.pcm > /tmp/got.pcm) &
+reader=$!
+sleep 1
+audacious -H -p /usr/share/luban/samples/music/aria.ogg >/tmp/audacious.log 2>&1 &
+ap=$!
+wait $reader
+kill $ap 2>/dev/null; pkill -x pipewire; pkill -x wireplumber; true
+n=$(wc -c < /tmp/got.pcm)
+loud=$(od -An -v -tx1 /tmp/got.pcm | tr -s ' ' '\\n' | grep -cv '^00$\\|^$')
+echo "pcm $n bytes, $loud not silent"
+[ "$n" -gt 100000 ] && [ "$loud" -gt 10000 ] && echo sound-played
+"""
+has = ["sound-played"]
+timeout = 300

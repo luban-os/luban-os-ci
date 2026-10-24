@@ -1,0 +1,12 @@
+id = "L4-06"
+what = "a desktop's logs are gathered from the host in one command"
+covers = ["LCI-L4-LOGS"]
+needs = ["kvm"]
+systems = ["desktop-machine"]
+
+# xlings design 2026-10-24 §6.3 (S13): luban logs and its bundle.
+[[step]]
+in = "host"
+run = "luban logs {system} --bundle {work}/L4-06-logs.tar && tar -tf {work}/L4-06-logs.tar"
+has = ["status.json"]
+timeout = 300
