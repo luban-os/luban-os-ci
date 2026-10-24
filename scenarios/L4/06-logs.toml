@@ -10,4 +10,3 @@ in = "host"
 run = "luban logs {system} --bundle {work}/L4-06-logs.tar && tar -tf {work}/L4-06-logs.tar"
 has = ["status.json"]
 timeout = 300
-known = "xlings 2026.10.24.2: luban logs"
