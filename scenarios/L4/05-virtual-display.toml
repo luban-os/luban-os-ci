@@ -1,0 +1,37 @@
+id = "L4-05"
+what = "a machine's desktop runs on a virtual display: captured, another display extends it, it ends when asked"
+covers = ["LCI-L4-DISPLAY-VIRTUAL"]
+needs = ["kvm"]
+systems = ["desktop-machine"]
+
+# xlings design 2026-10-24 §4 (S9, S11): no window -- the desktop's displays
+# on the bus, through `luban display`; the machine's frames through its
+# shared memory.
+[[step]]
+in = "host"
+run = "luban enter {system} --display virtual=1280x800"
+has = ["runs on a virtual display"]
+timeout = 900
+known = "xlings 2026.10.24.2: luban enter --display virtual for a machine"
+
+[[step]]
+in = "host"
+run = "sleep 20; luban display {system} capture {work}/L4-05-desktop.png && head -c 8 {work}/L4-05-desktop.png | od -An -c"
+has = ["P   N   G"]
+timeout = 120
+known = "xlings 2026.10.24.2"
+
+[[step]]
+in = "host"
+what = "a second virtual display extends it"
+run = "luban display {system} attach virtual=800x600 && sleep 5 && luban display {system}"
+has = ["extend"]
+timeout = 120
+known = "xlings 2026.10.24.2"
+
+[[step]]
+in = "host"
+run = "luban display {system} end; sleep 5; luban display {system} 2>&1 || true"
+has = ["is ending"]
+timeout = 120
+known = "xlings 2026.10.24.2"

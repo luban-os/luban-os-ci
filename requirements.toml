@@ -38,6 +38,10 @@ text = "the launcher lists the desktop's programs"
 text = "Falkon opens a page in a desktop and stays up"
 [LCI-L4-SOUND]
 text = "the desktop's player plays the sample through the system's sound"
+[LCI-L4-DISPLAY-VIRTUAL]
+text = "a machine's desktop runs on a virtual display: captured from the host, extended by another display, ended when asked"
+[LCI-L4-LOGS]
+text = "a desktop's logs are gathered from the host in one command, with its status"
 [LCI-L5-FILES]
 text = "a machine reads its files over virtio-fs within its budget; 9p is measured beside it"
 [LCI-L5-IDLE]
